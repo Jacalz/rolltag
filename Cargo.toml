@@ -1,0 +1,13 @@
+[package]
+name = "rolltag"
+version = "0.1.0"
+edition = "2024"
+
+[profile.release]
+strip = true
+lto = true
+panic = "abort"
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.48", features = ["derive"] }
