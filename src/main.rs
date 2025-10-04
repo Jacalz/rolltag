@@ -1,5 +1,6 @@
 use anyhow::{Result, anyhow};
 use clap::Parser;
+use rexiv2::Metadata;
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -28,7 +29,9 @@ fn main() -> Result<()> {
     if !args.src.exists() {
         return Err(anyhow!("Source directory does not exist"));
     }
-    println!("Applying metadata to files in {}", args.src.display());
 
-    return Ok(());
+    let meta = Metadata::new_from_path(&args.src)?;
+    println!("{:?}", meta.get_tag_multiple_strings("Exif.Image.Make")?);
+
+    Ok(())
 }
