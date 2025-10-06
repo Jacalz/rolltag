@@ -30,7 +30,7 @@ fn main() -> Result<()> {
         let meta = Metadata::new_from_path(file)?;
 
         if let Some(iso) = args.iso {
-            meta.set_tag_numeric("Exif.Photo.ISOSpeedRatings", iso as i32)?;
+            meta.set_tag_numeric("Exif.Photo.ISOSpeedRatings", i32::from(iso))?;
         }
 
         if let Some(camera) = &args.camera {
