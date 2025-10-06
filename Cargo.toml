@@ -13,3 +13,13 @@ anyhow = "1.0.100"
 clap = { version = "4.5.48", features = ["derive"] }
 rexiv2 = "0.10.0"
 tempfile = "3.23.0"
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false
+
+[profile.debugging]
+inherits = "dev"
+debug = true
