@@ -11,6 +11,10 @@ struct Args {
     /// Source directory of files to apply metadata to.
     src: Vec<PathBuf>,
 
+    /// Set the film stock used.
+    #[arg(short, long)]
+    film: Option<String>,
+
     /// Set the ISO film speed used.
     #[arg(short, long)]
     iso: Option<u16>,
@@ -39,6 +43,10 @@ fn main() -> Result<()> {
 
 fn apply_metadata(args: &Args, file: &PathBuf) -> Result<(), anyhow::Error> {
     let meta = Metadata::new_from_path(file)?;
+
+    if let Some(film) = &args.film {
+        meta.set_tag_string("Exif.Image.ImageDescription", film)?;
+    }
 
     if let Some(iso) = args.iso {
         meta.set_tag_numeric("Exif.Photo.ISOSpeedRatings", i32::from(iso))?;
