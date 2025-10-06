@@ -1,6 +1,7 @@
 use anyhow::{Result, anyhow};
 use clap::Parser;
 use rexiv2::Metadata;
+use std::fs;
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -22,6 +23,7 @@ struct Args {
 
 fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
     let temp = tempfile::NamedTempFile::new_in(file.parent().unwrap())?;
+    fs::copy(file, &temp)?;
     meta.save_to_file(temp.path())?;
     temp.persist(file)?;
     Ok(())
