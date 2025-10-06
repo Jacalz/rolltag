@@ -3,6 +3,7 @@
 # rolltag
 A tool for tagging Exif metadata to scanned images from digitalized film rolls.
 The goal is for the tool to be both safe and fast with little risk for corrupting your files.
+This is achieved in part by parallelizing the processing and atomically updating images.
 
 ## Building
 

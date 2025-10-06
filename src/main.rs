@@ -1,5 +1,7 @@
 use anyhow::{Result, anyhow};
 use clap::Parser;
+use rayon::ThreadPoolBuilder;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rexiv2::Metadata;
 use std::fs;
 use std::path::PathBuf;
@@ -34,11 +36,11 @@ fn main() -> Result<()> {
         return Err(anyhow!("No flags for modifying the metadata were provided"));
     }
 
-    for file in &args.src {
-        apply_metadata(&args, file)?;
-    }
-
-    Ok(())
+    ThreadPoolBuilder::new().build()?.install(|| -> Result<()> {
+        args.src.par_iter().try_for_each(|path| -> Result<()> {
+            return apply_metadata(&args, path);
+        })
+    })
 }
 
 fn apply_metadata(args: &Args, file: &PathBuf) -> Result<(), anyhow::Error> {
