@@ -25,6 +25,11 @@ struct Args {
     /// First word is parsed as the camera maker while the rest is set as the camera model.
     #[arg(short, long)]
     camera: Option<String>,
+
+    /// Set the lens model used.
+    /// First word is parsed as the lens maker while the rest is set as the lens model.
+    #[arg(short, long)]
+    lens: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -58,6 +63,12 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<(), anyhow::Error> {
         let (make, model) = camera.split_once(' ').unwrap_or_default();
         meta.set_tag_string("Exif.Image.Make", make)?;
         meta.set_tag_string("Exif.Image.Model", model)?;
+    }
+
+    if let Some(lens) = &args.lens {
+        let (make, model) = lens.split_once(' ').unwrap_or_default();
+        meta.set_tag_string("Exif.Photo.LensMake", make)?;
+        meta.set_tag_string("Exif.Photo.LensModel", model)?;
     }
 
     safe_write_metadata(file, &meta)
