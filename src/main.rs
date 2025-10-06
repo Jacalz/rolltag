@@ -37,9 +37,9 @@ fn main() -> Result<()> {
     }
 
     ThreadPoolBuilder::new().build()?.install(|| -> Result<()> {
-        args.src.par_iter().try_for_each(|path| -> Result<()> {
-            return apply_metadata(&args, path);
-        })
+        args.src
+            .par_iter()
+            .try_for_each(|path| -> Result<()> { apply_metadata(&args, path) })
     })
 }
 
