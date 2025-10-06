@@ -21,14 +21,6 @@ struct Args {
     camera: Option<String>,
 }
 
-fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
-    let temp = tempfile::NamedTempFile::new_in(file.parent().unwrap())?;
-    fs::copy(file, &temp)?;
-    meta.save_to_file(temp.path())?;
-    temp.persist(file)?;
-    Ok(())
-}
-
 fn main() -> Result<()> {
     let args = Args::parse();
     if args.src.is_empty() {
@@ -39,20 +31,32 @@ fn main() -> Result<()> {
     }
 
     for file in &args.src {
-        let meta = Metadata::new_from_path(file)?;
-
-        if let Some(iso) = args.iso {
-            meta.set_tag_numeric("Exif.Photo.ISOSpeedRatings", i32::from(iso))?;
-        }
-
-        if let Some(camera) = &args.camera {
-            let (make, model) = camera.split_once(' ').unwrap_or_default();
-            meta.set_tag_string("Exif.Image.Make", make)?;
-            meta.set_tag_string("Exif.Image.Model", model)?;
-        }
-
-        safe_write_metadata(file, &meta)?;
+        apply_metadata(&args, file)?;
     }
 
+    Ok(())
+}
+
+fn apply_metadata(args: &Args, file: &PathBuf) -> Result<(), anyhow::Error> {
+    let meta = Metadata::new_from_path(file)?;
+
+    if let Some(iso) = args.iso {
+        meta.set_tag_numeric("Exif.Photo.ISOSpeedRatings", i32::from(iso))?;
+    }
+
+    if let Some(camera) = &args.camera {
+        let (make, model) = camera.split_once(' ').unwrap_or_default();
+        meta.set_tag_string("Exif.Image.Make", make)?;
+        meta.set_tag_string("Exif.Image.Model", model)?;
+    }
+
+    safe_write_metadata(file, &meta)
+}
+
+fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
+    let temp = tempfile::NamedTempFile::new_in(file.parent().unwrap())?;
+    fs::copy(file, &temp)?;
+    meta.save_to_file(temp.path())?;
+    temp.persist(file)?;
     Ok(())
 }
