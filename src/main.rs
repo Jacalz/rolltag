@@ -22,8 +22,8 @@ struct Args {
 
 fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
     let temp = tempfile::NamedTempFile::new_in(file.parent().unwrap())?;
-    meta.save_to_file(&temp.path())?;
-    temp.persist(&file)?;
+    meta.save_to_file(temp.path())?;
+    temp.persist(file)?;
     Ok(())
 }
 
@@ -49,7 +49,7 @@ fn main() -> Result<()> {
             meta.set_tag_string("Exif.Image.Model", model)?;
         }
 
-        safe_write_metadata(&file, &meta)?;
+        safe_write_metadata(file, &meta)?;
     }
 
     Ok(())
