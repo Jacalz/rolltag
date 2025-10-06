@@ -25,6 +25,9 @@ fn main() -> Result<()> {
     if args.src.is_empty() {
         return Err(anyhow!("No files were provided"));
     }
+    if args.iso.is_none() && args.camera.is_none() {
+        return Err(anyhow!("No flags for modifying the metadata were provided"));
+    }
 
     for file in &args.src {
         let meta = Metadata::new_from_path(file)?;
