@@ -12,3 +12,4 @@ panic = "abort"
 anyhow = "1.0.100"
 clap = { version = "4.5.48", features = ["derive"] }
 rexiv2 = "0.10.0"
+tempfile = "3.23.0"

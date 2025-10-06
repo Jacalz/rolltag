@@ -20,6 +20,13 @@ struct Args {
     camera: Option<String>,
 }
 
+fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
+    let temp = tempfile::NamedTempFile::new_in(file.parent().unwrap())?;
+    meta.save_to_file(&temp.path())?;
+    temp.persist(&file)?;
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args = Args::parse();
     if args.src.is_empty() {
@@ -42,7 +49,7 @@ fn main() -> Result<()> {
             meta.set_tag_string("Exif.Image.Model", model)?;
         }
 
-        meta.save_to_file(file)?;
+        safe_write_metadata(&file, &meta)?;
     }
 
     Ok(())
