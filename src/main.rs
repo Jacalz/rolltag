@@ -48,7 +48,7 @@ fn main() -> Result<()> {
     })
 }
 
-fn apply_metadata(args: &Args, file: &PathBuf) -> Result<(), anyhow::Error> {
+fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
     let meta = Metadata::new_from_path(file)?;
 
     if let Some(film) = &args.film {
