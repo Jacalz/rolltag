@@ -30,6 +30,10 @@ struct Args {
     /// First word is parsed as the lens maker while the rest is set as the lens model.
     #[arg(short, long)]
     lens: Option<String>,
+
+    /// Clear all metadata from the image before applying new metadata.
+    #[arg(short, long)]
+    clear: bool,
 }
 
 fn main() -> Result<()> {
@@ -50,6 +54,10 @@ fn main() -> Result<()> {
 
 fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
     let meta = Metadata::new_from_path(file)?;
+
+    if args.clear {
+        meta.clear_exif();
+    }
 
     if let Some(film) = &args.film {
         meta.set_tag_string("Exif.Image.ImageDescription", film)?;
