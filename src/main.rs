@@ -34,6 +34,10 @@ struct Args {
     /// Clear all metadata from the image before applying new metadata.
     #[arg(short, long)]
     clear: bool,
+
+    /// Set the artist name.
+    #[arg(short, long)]
+    artist: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -77,6 +81,10 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
         let (make, model) = lens.split_once(' ').unwrap_or_default();
         meta.set_tag_string("Exif.Photo.LensMake", make)?;
         meta.set_tag_string("Exif.Photo.LensModel", model)?;
+    }
+
+    if let Some(artist) = &args.artist {
+        meta.set_tag_string("Exif.Image.Artist", artist)?;
     }
 
     safe_write_metadata(file, &meta)
