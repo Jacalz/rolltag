@@ -38,6 +38,10 @@ struct Args {
     /// Set the artist name.
     #[arg(short, long)]
     artist: Option<String>,
+
+    /// Set the focal length of the lens used.
+    #[arg(short, long)]
+    focal_length: Option<u16>,
 }
 
 fn main() -> Result<()> {
@@ -75,6 +79,10 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
         let (make, model) = camera.split_once(' ').unwrap_or_default();
         meta.set_tag_string("Exif.Image.Make", make)?;
         meta.set_tag_string("Exif.Image.Model", model)?;
+    }
+
+    if let Some(focal_length) = args.focal_length {
+        meta.set_tag_numeric("Exif.Image.FocalLength", i32::from(focal_length))?;
     }
 
     if let Some(lens) = &args.lens {
