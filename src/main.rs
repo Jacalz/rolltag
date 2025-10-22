@@ -10,7 +10,7 @@ use std::path::PathBuf;
 #[command(author, version, about, long_about = None)]
 /// A tool for tagging Exif metadata to scanned images from film rolls.
 struct Args {
-    /// Source directory of files to apply metadata to.
+    /// Source files to apply metadata to.
     src: Vec<PathBuf>,
 
     /// Set the film stock used.
