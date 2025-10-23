@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use time::{OffsetDateTime, macros::format_description};
 
 const DATE_TIME_FORMAT: &[time::format_description::FormatItem<'_>] =
-    format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
+    format_description!("[year]:[month]:[day] [hour]:[minute]:[second]");
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -107,10 +107,15 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
 // This is required to ensure correct ordering when sorting files to avoid
 // using the modification date as the primary sorting key.
 fn set_timestamps(file: &Path, meta: &Metadata) -> Result<()> {
-    let time = OffsetDateTime::from(file.metadata()?.created()?);
-    let time_str = time.format(DATE_TIME_FORMAT)?;
-    meta.set_tag_string("Exif.Photo.DateTimeOriginal", &time_str)?;
-    meta.set_tag_string("Exif.Photo.DateTimeDigitized", &time_str)?;
+    if let Ok(existing) = meta.get_tag_string("Exif.Photo.DateTimeOriginal") {
+        meta.set_tag_string("Exif.Photo.DateTimeDigitized", &existing)?;
+        return Ok(());
+    }
+
+    let mtime = file.metadata()?.modified()?;
+    let time = OffsetDateTime::from(mtime).format(DATE_TIME_FORMAT)?;
+    meta.set_tag_string("Exif.Photo.DateTimeOriginal", &time)?;
+    meta.set_tag_string("Exif.Photo.DateTimeDigitized", &time)?;
     Ok(())
 }
 
