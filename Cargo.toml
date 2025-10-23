@@ -14,6 +14,7 @@ clap = { version = "4.5.48", features = ["derive"] }
 rayon = "1.11.0"
 rexiv2 = "0.10.0"
 tempfile = "3.23.0"
+time = { version = "0.3.44", features = ["formatting", "macros"] }
 
 [profile.dev]
 debug = "line-tables-only"

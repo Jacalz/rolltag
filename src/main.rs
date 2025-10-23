@@ -5,6 +5,10 @@ use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rexiv2::Metadata;
 use std::fs;
 use std::path::PathBuf;
+use time::{OffsetDateTime, macros::format_description};
+
+const DATE_TIME_FORMAT: &[time::format_description::FormatItem<'_>] =
+    format_description!("[year]-[month]-[day] [hour]:[minute]:[second]");
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -67,6 +71,8 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
         meta.clear_exif();
     }
 
+    set_timestamps(file, &meta)?;
+
     if let Some(film) = &args.film {
         meta.set_tag_string("Exif.Image.ImageDescription", film)?;
     }
@@ -96,6 +102,16 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
     }
 
     safe_write_metadata(file, &meta)
+}
+
+// This is required to ensure correct ordering when sorting files to avoid
+// using the modification date as the primary sorting key.
+fn set_timestamps(file: &PathBuf, meta: &Metadata) -> Result<()> {
+    let time = OffsetDateTime::from(file.metadata()?.created()?);
+    let time_str = time.format(DATE_TIME_FORMAT)?;
+    meta.set_tag_string("Exif.Photo.DateTimeOriginal", &time_str)?;
+    meta.set_tag_string("Exif.Photo.DateTimeDigitized", &time_str)?;
+    Ok(())
 }
 
 fn safe_write_metadata(file: &PathBuf, meta: &Metadata) -> Result<()> {
