@@ -4,7 +4,7 @@ use rayon::ThreadPoolBuilder;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rexiv2::Metadata;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use time::{OffsetDateTime, macros::format_description};
 
 const DATE_TIME_FORMAT: &[time::format_description::FormatItem<'_>] =
@@ -106,7 +106,7 @@ fn apply_metadata(args: &Args, file: &PathBuf) -> Result<()> {
 
 // This is required to ensure correct ordering when sorting files to avoid
 // using the modification date as the primary sorting key.
-fn set_timestamps(file: &PathBuf, meta: &Metadata) -> Result<()> {
+fn set_timestamps(file: &Path, meta: &Metadata) -> Result<()> {
     let time = OffsetDateTime::from(file.metadata()?.created()?);
     let time_str = time.format(DATE_TIME_FORMAT)?;
     meta.set_tag_string("Exif.Photo.DateTimeOriginal", &time_str)?;
